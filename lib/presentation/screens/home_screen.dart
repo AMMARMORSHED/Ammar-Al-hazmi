@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.mounted) {
+      if (mounted) {
         context.read<AppState>().loadInitial();
       }
     });
@@ -34,9 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(loc.tr('app_name')),
         actions: [
           IconButton(
-            onPressed: () {
-              // Search will be implemented in next phase.
-            },
+            onPressed: () {},
             icon: const Icon(Icons.search),
           ),
         ],
@@ -44,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: state.isBusy
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: () async => state.refreshLedgerData(),
+              onRefresh: state.refreshLedgerData,
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
@@ -108,11 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () async {
           final result = await showModalBottomSheet<String>(
             context: context,
-            builder: (context) => _QuickActionSheet(),
+            builder: (context) => const _QuickActionSheet(),
           );
 
           if (result == 'person') {
-            if (!context.mounted) return;
+            if (!mounted) return;
             await Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AddPersonScreen()),
@@ -120,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (result == 'transaction') {
-            if (!context.mounted) return;
+            if (!mounted) return;
             await Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
@@ -356,7 +354,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
-              value: (state.persons.isNotEmpty ? state.persons.first.id : null),
+              value: state.persons.isNotEmpty ? state.persons.first.id : null,
               items: state.persons
                   .map((person) => DropdownMenuItem<int>(value: person.id, child: Text(person.name)))
                   .toList(),
