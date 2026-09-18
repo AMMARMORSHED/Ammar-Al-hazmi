@@ -1,39 +1,39 @@
-# دفتر الحسابات | Daftar Alhisabat
+# This is the current phase of the project: foundation + accounting engine + app shell.
 
-تطبيق Flutter لإدارة الديون والحسابات الشخصية والتجارية، يعمل Offline-first باستخدام SQLite، ويدعم العربية RTL وEnglish LTR، الدفاتر المتعددة والعملات والتقارير والتصدير.
+## Project status
+The repository now contains a structured Flutter app foundation with:
+- SQLite database layer
+- multi-ledger / multi-currency models
+- localization for Arabic and English
+- dashboard and person/account screens
+- app state management via Provider
+- account balance calculation based on transactions, not saved cache
 
-## المتطلبات
-- Flutter 3.22+ / Dart 3.3+
-- Android Studio أو VS Code
+## Requirements
+- Flutter 3.3+
+- Android Studio or VS Code
 - Android SDK 21+
 
-## التشغيل والبناء
+## Run
 ```bash
 flutter pub get
 flutter analyze
 flutter test
 flutter run
+```
+
+## Build APK
+```bash
 flutter build apk --release
 ```
 
-## البنية
-- `lib/data/database`: مخطط SQLite وعمليات النسخ الاحتياطي.
-- `lib/data/models`: نماذج البيانات والتحويل إلى SQLite.
-- `lib/data/repositories`: مصدر الحقيقة للدفاتر والأشخاص والعمليات.
-- `lib/services`: PDF/Excel/مشاركة/تنبيهات.
-- `lib/presentation`: الشاشات والمكونات وProvider state.
-- `lib/core`: الثوابت، التنسيق، الثيم، والتعريب.
+## Architecture overview
+- `lib/core` : localization, theme, constants
+- `lib/data/database` : SQLite schema and initialization
+- `lib/data/models` : domain models
+- `lib/data/repositories` : repository access layer
+- `lib/domain/services` : business logic such as balance calculation
+- `lib/presentation` : screens, widgets, providers
 
-كل الرصيد مشتق من العمليات: `receivable - payable`. الدفع والاستلام يغيران الاتجاه المحاسبي ولا يتم تخزين الرصيد كحقيقة نهائية.
-
-## قاعدة البيانات
-الإصدار الحالي 1 ويحتوي على ledgers, currencies, persons, categories, transactions, attachments, reminders, account_closures, app_settings, audit_log, exchange_rates. توجد Foreign Keys وفهارس وعمليات migration.
-
-## إضافة لغة أو عملة
-أضف مفاتيح اللغة إلى `lib/core/localization/app_localizations.dart` وإلى ملفات `lib/l10n/app_*.arb`. أضف العملة إلى `CurrencyCatalog` أو جدول currencies في migration.
-
-## التصدير والخصوصية
-PDF وExcel ونسخ JSON الاحتياطية تعمل محلياً وتستخدم Android Share Sheet. لا توجد اتصالات خادم ولا API keys. يمكن لاحقاً إضافة Cloud Sync عبر Repository interface دون تغيير واجهة المستخدم.
-
-## ملاحظات Android
-للتذكيرات استخدم إذن POST_NOTIFICATIONS في Android 13+. للبصمة أضف USE_BIOMETRIC. لا تُطلب صلاحيات الملفات العامة؛ File Picker وShare Sheet يستخدمان Storage Access Framework.
+## Notes
+This is a step-by-step implementation of the full requested system. The core architecture is ready for extension toward backup/restore, reminders, PDFs, Excel reporting, and advanced reports.

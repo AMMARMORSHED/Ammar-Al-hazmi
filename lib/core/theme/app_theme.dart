@@ -1,6 +1,65 @@
 import 'package:flutter/material.dart';
+
 class AppTheme {
-  static ThemeData light = _theme(Brightness.light);
-  static ThemeData dark = _theme(Brightness.dark);
-  static ThemeData _theme(Brightness b) { final color = ColorScheme.fromSeed(seedColor: const Color(0xff176b87), brightness: b); return ThemeData(useMaterial3: true, colorScheme: color, brightness: b, cardTheme: const CardTheme(margin: EdgeInsets.symmetric(vertical: 6), elevation: 0), inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder(), filled: true), visualDensity: VisualDensity.adaptivePlatformDensity); }
+  static ThemeData get light {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF106A73),
+      brightness: Brightness.light,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: const Color(0xFFF7F9FC),
+      appBarTheme: const AppBarTheme(
+        centerTitle: false,
+        elevation: 0,
+      ),
+      cardTheme: CardTheme(
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+    );
+  }
+
+  static ThemeData get dark {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF106A73),
+      brightness: Brightness.dark,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: const Color(0xFF101418),
+      appBarTheme: const AppBarTheme(
+        centerTitle: false,
+        elevation: 0,
+      ),
+      cardTheme: CardTheme(
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: const Color(0xFF1A1F24),
+      ),
+    );
+  }
 }

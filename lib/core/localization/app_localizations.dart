@@ -1,41 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AppLocalizations {
-  final Locale locale;
-  AppLocalizations(this.locale);
   static const supportedLocales = [Locale('ar'), Locale('en')];
-  static AppLocalizations of(BuildContext context) => Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+
+  static const delegate = _AppLocalizationsDelegate();
+
+  final Locale locale;
+
+  const AppLocalizations(this.locale);
+
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+  }
+
   bool get isArabic => locale.languageCode == 'ar';
-  TextDirection get direction => isArabic ? TextDirection.rtl : TextDirection.ltr;
-  String t(String key) => _values[key]?[isArabic ? 'ar' : 'en'] ?? key;
-  String date(DateTime d) => DateFormat(isArabic ? 'yyyy/MM/dd' : 'dd/MM/yyyy', locale.languageCode).format(d);
-  String money(num value, String code, int digits) => '${NumberFormat.currency(symbol: '', decimalDigits: digits, locale: locale.languageCode).format(value)} $code';
+
+  String get currentLanguageName => isArabic ? 'العربية' : 'English';
+
+  String tr(String key) {
+    final map = _values[key];
+    if (map == null) return key;
+    return map[locale.languageCode] ?? map['en'] ?? key;
+  }
+
   static final Map<String, Map<String, String>> _values = {
-    'appName': {'ar':'دفتر الحسابات','en':'Daftar Alhisabat'}, 'home': {'ar':'الرئيسية','en':'Home'},
-    'accounts': {'ar':'الحسابات','en':'Accounts'}, 'transactions': {'ar':'العمليات','en':'Transactions'},
-    'reports': {'ar':'التقارير','en':'Reports'}, 'settings': {'ar':'الإعدادات','en':'Settings'},
-    'receivable': {'ar':'لي عنده','en':'Receivable'}, 'payable': {'ar':'عليّ له','en':'Payable'},
-    'received': {'ar':'استلام','en':'Received'}, 'paid': {'ar':'دفعة','en':'Paid'},
-    'balance': {'ar':'الرصيد','en':'Balance'}, 'totalReceivable': {'ar':'إجمالي ما لي','en':'Total receivable'},
-    'totalPayable': {'ar':'إجمالي ما عليّ','en':'Total payable'}, 'net': {'ar':'صافي الرصيد','en':'Net balance'},
-    'addPerson': {'ar':'إضافة شخص','en':'Add person'}, 'addTransaction': {'ar':'إضافة عملية','en':'Add transaction'},
-    'name': {'ar':'الاسم','en':'Name'}, 'phone': {'ar':'رقم الهاتف','en':'Phone'}, 'amount': {'ar':'المبلغ','en':'Amount'},
-    'description': {'ar':'الوصف','en':'Description'}, 'save': {'ar':'حفظ','en':'Save'}, 'cancel': {'ar':'إلغاء','en':'Cancel'},
-    'delete': {'ar':'حذف','en':'Delete'}, 'edit': {'ar':'تعديل','en':'Edit'}, 'search': {'ar':'بحث','en':'Search'},
-    'noData': {'ar':'لا توجد بيانات بعد','en':'No data yet'}, 'ledger': {'ar':'الدفتر','en':'Ledger'},
-    'currency': {'ar':'العملة','en':'Currency'}, 'ledgers': {'ar':'دفاتري','en':'My ledgers'},
-    'language': {'ar':'اللغة','en':'Language'}, 'theme': {'ar':'المظهر','en':'Theme'},
-    'light': {'ar':'فاتح','en':'Light'}, 'dark': {'ar':'داكن','en':'Dark'}, 'system': {'ar':'حسب النظام','en':'System'},
-    'error': {'ar':'حدث خطأ، يرجى المحاولة مرة أخرى','en':'Something went wrong. Please try again.'},
-    'required': {'ar':'هذا الحقل مطلوب','en':'This field is required'}, 'confirmDelete': {'ar':'هل أنت متأكد من الحذف؟','en':'Are you sure you want to delete?'},
-    'all': {'ar':'الكل','en':'All'}, 'recent': {'ar':'آخر العمليات','en':'Recent transactions'}, 'closeAccount': {'ar':'إغلاق الحساب','en':'Close account'},
-    'reportsSoon': {'ar':'التقارير والتصدير متاحان من تفاصيل الحساب','en':'Reports and export are available from account details'},
+    'app_name': {'ar': 'دفتر الحسابات', 'en': 'Daftar Alhisabat'},
+    'home': {'ar': 'الرئيسية', 'en': 'Home'},
+    'accounts': {'ar': 'الحسابات', 'en': 'Accounts'},
+    'transactions': {'ar': 'العمليات', 'en': 'Transactions'},
+    'reports': {'ar': 'التقارير', 'en': 'Reports'},
+    'settings': {'ar': 'الإعدادات', 'en': 'Settings'},
+    'total_receivable': {'ar': 'إجمالي ما لي', 'en': 'Total receivable'},
+    'total_payable': {'ar': 'إجمالي ما عليّ', 'en': 'Total payable'},
+    'net_balance': {'ar': 'صافي الرصيد', 'en': 'Net balance'},
+    'people_count': {'ar': 'عدد الأشخاص', 'en': 'People count'},
+    'recent_transactions': {'ar': 'آخر العمليات', 'en': 'Recent transactions'},
+    'add_person': {'ar': 'إضافة شخص', 'en': 'Add person'},
+    'add_transaction': {'ar': 'إضافة عملية', 'en': 'Add transaction'},
+    'name': {'ar': 'الاسم', 'en': 'Name'},
+    'phone': {'ar': 'رقم الهاتف', 'en': 'Phone'},
+    'description': {'ar': 'الوصف', 'en': 'Description'},
+    'amount': {'ar': 'المبلغ', 'en': 'Amount'},
+    'date': {'ar': 'التاريخ', 'en': 'Date'},
+    'currency': {'ar': 'العملة', 'en': 'Currency'},
+    'ledger': {'ar': 'الدفتر', 'en': 'Ledger'},
+    'save': {'ar': 'حفظ', 'en': 'Save'},
+    'cancel': {'ar': 'إلغاء', 'en': 'Cancel'},
+    'delete': {'ar': 'حذف', 'en': 'Delete'},
+    'edit': {'ar': 'تعديل', 'en': 'Edit'},
+    'search': {'ar': 'بحث', 'en': 'Search'},
+    'type': {'ar': 'النوع', 'en': 'Type'},
+    'receivable': {'ar': 'لي عنده', 'en': 'Receivable'},
+    'payable': {'ar': 'عليّ له', 'en': 'Payable'},
+    'received': {'ar': 'استلام', 'en': 'Received'},
+    'paid': {'ar': 'دفعة', 'en': 'Paid'},
+    'balance': {'ar': 'الرصيد', 'en': 'Balance'},
+    'language': {'ar': 'اللغة', 'en': 'Language'},
+    'theme': {'ar': 'المظهر', 'en': 'Theme'},
+    'light': {'ar': 'فاتح', 'en': 'Light'},
+    'dark': {'ar': 'داكن', 'en': 'Dark'},
+    'system': {'ar': 'حسب النظام', 'en': 'System'},
+    'error_generic': {'ar': 'حدث خطأ أثناء حفظ العملية. يرجى المحاولة مرة أخرى.', 'en': 'Something went wrong while saving. Please try again.'},
+    'no_accounts': {'ar': 'لا توجد حسابات بعد', 'en': 'No accounts yet'},
+    'no_transactions': {'ar': 'لا توجد عمليات', 'en': 'No transactions'},
+    'start_now': {'ar': 'ابدأ الآن', 'en': 'Start now'},
+    'confirm_delete': {'ar': 'هل أنت متأكد من حذف هذا العنصر؟', 'en': 'Are you sure you want to delete this item?'},
+    'close_account': {'ar': 'إغلاق الحساب', 'en': 'Close account'},
+    'reopen_account': {'ar': 'إعادة فتح الحساب', 'en': 'Reopen account'},
   };
 }
-class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
-  const AppLocalizationsDelegate();
-  @override bool isSupported(Locale l) => ['ar','en'].contains(l.languageCode);
-  @override Future<AppLocalizations> load(Locale l) async => AppLocalizations(l);
-  @override bool shouldReload(AppLocalizationsDelegate old) => false;
+
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => ['ar', 'en'].contains(locale.languageCode);
+
+  @override
+  Future<AppLocalizations> load(Locale locale) async {
+    return AppLocalizations(locale);
+  }
+
+  @override
+  bool shouldReload(covariant LocalizationsDelegate<AppLocalizations> old) => false;
 }
