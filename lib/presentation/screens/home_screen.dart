@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/localization/app_localizations.dart';
 import '../../data/models/person_model.dart';
@@ -17,7 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AppState>().loadInitial();
+      if (context.mounted) {
+        context.read<AppState>().loadInitial();
+      }
     });
   }
 
@@ -31,17 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(loc.tr('app_name')),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
             onPressed: () {
-              // search will be expanded in a later phase
+              // Search will be implemented in next phase.
             },
+            icon: const Icon(Icons.search),
           ),
         ],
       ),
       body: state.isBusy
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: state.refreshLedgerData,
+              onRefresh: () async => state.refreshLedgerData(),
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
@@ -58,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2,
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 1.8,
-                    mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                     children: [
                       _StatCard(
                         title: loc.tr('total_receivable'),
@@ -83,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 12),
                   Text(
                     loc.tr('recent_transactions'),
                     style: Theme.of(context).textTheme.titleLarge,
@@ -109,22 +112,18 @@ class _HomeScreenState extends State<HomeScreen> {
           );
 
           if (result == 'person') {
-            if (!mounted) return;
+            if (!context.mounted) return;
             await Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const AddPersonScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const AddPersonScreen()),
             );
           }
 
           if (result == 'transaction') {
-            if (!mounted) return;
+            if (!context.mounted) return;
             await Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const AddTransactionScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
             );
           }
         },
@@ -199,7 +198,9 @@ class _TransactionTile extends StatelessWidget {
           transaction.type == 'receivable' || transaction.type == 'received'
               ? Icons.arrow_upward
               : Icons.arrow_downward,
-          color: transaction.type == 'receivable' || transaction.type == 'received' ? Colors.green : Colors.red,
+          color: transaction.type == 'receivable' || transaction.type == 'received'
+              ? Colors.green
+              : Colors.red,
         ),
         title: Text(transaction.description.isNotEmpty ? transaction.description : typeLabel),
         subtitle: Text('${transaction.date.toLocal().toString().split(' ')[0]} • $typeLabel'),
@@ -213,6 +214,8 @@ class _TransactionTile extends StatelessWidget {
 }
 
 class _QuickActionSheet extends StatelessWidget {
+  const _QuickActionSheet();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -275,7 +278,7 @@ class _AddPersonScreenState extends State<AddPersonScreen> {
             TextField(
               controller: notesController,
               maxLines: 4,
-              decoration: InputDecoration(labelText: 'Notes'),
+              decoration: const InputDecoration(labelText: 'Notes'),
             ),
             const Spacer(),
             SizedBox(
@@ -353,7 +356,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
-              value: state.persons.isNotEmpty ? state.persons.first.id : null,
+              value: (state.persons.isNotEmpty ? state.persons.first.id : null),
               items: state.persons
                   .map((person) => DropdownMenuItem<int>(value: person.id, child: Text(person.name)))
                   .toList(),
@@ -375,7 +378,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             TextField(
               controller: notesController,
               maxLines: 3,
-              decoration: InputDecoration(labelText: 'Notes'),
+              decoration: const InputDecoration(labelText: 'Notes'),
             ),
             const Spacer(),
             SizedBox(
@@ -384,6 +387,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 onPressed: () async {
                   final amountValue = double.tryParse(amountController.text.trim());
                   final selectedPersonId = personId ?? state.persons.firstOrNull?.id;
+
                   if (amountValue == null || amountValue <= 0 || selectedPersonId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(loc.tr('error_generic'))),
@@ -419,6 +423,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 }
 
-extension FirstOrNull<T> on List<T> {
+extension ListFirstOrNull<T> on List<T> {
   T? get firstOrNull => isEmpty ? null : first;
 }

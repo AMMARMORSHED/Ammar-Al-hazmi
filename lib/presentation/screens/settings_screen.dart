@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/localization/app_localizations.dart';
 import '../providers/app_state.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -9,57 +8,26 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-
+    final state = context.watch<AppState>();
     return Scaffold(
-      appBar: AppBar(title: Text(loc.tr('settings'))),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.language),
-            title: Text(loc.tr('language')),
-            subtitle: const Text('العربية / English'),
+            title: const Text('Language'),
+            subtitle: const Text('Arabic / English'),
           ),
           ListTile(
-            leading: const Icon(Icons.color_lens_outlined),
-            title: Text(loc.tr('theme')),
-            subtitle: Text(loc.tr('system')),
+            leading: const Icon(Icons.dark_mode_outlined),
+            title: const Text('Theme'),
+            subtitle: Text('${state.selectedLedger?.currencyCode ?? 'YER'}'),
           ),
           ListTile(
             leading: const Icon(Icons.backup_outlined),
-            title: const Text('Backup'),
+            title: const Text('Backup & Restore'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ReportsScreen extends StatelessWidget {
-  const ReportsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-    final loc = AppLocalizations.of(context);
-
-    return Scaffold(
-      appBar: AppBar(title: Text(loc.tr('reports'))),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(loc.tr('total_receivable'), style: Theme.of(context).textTheme.titleMedium),
-            Text('${state.totalReceivable.toStringAsFixed(0)} ${state.selectedLedger?.currencyCode ?? 'YER'}'),
-            const SizedBox(height: 12),
-            Text(loc.tr('total_payable'), style: Theme.of(context).textTheme.titleMedium),
-            Text('${state.totalPayable.toStringAsFixed(0)} ${state.selectedLedger?.currencyCode ?? 'YER'}'),
-            const SizedBox(height: 12),
-            Text(loc.tr('net_balance'), style: Theme.of(context).textTheme.titleMedium),
-            Text('${state.netBalance.toStringAsFixed(0)} ${state.selectedLedger?.currencyCode ?? 'YER'}'),
-          ],
-        ),
       ),
     );
   }
