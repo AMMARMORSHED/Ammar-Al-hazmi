@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/localization/app_localizations.dart';
+import '../../data/database/app_database.dart';
 import '../../data/models/ledger_model.dart';
 import '../../data/models/person_model.dart';
 import '../../data/models/transaction_model.dart';
-import '../database/app_database.dart';
 
 class AppState extends ChangeNotifier {
   AppState(this.database);
@@ -24,19 +23,14 @@ class AppState extends ChangeNotifier {
     try {
       ledgers = await database.getLedgers();
       if (ledgers.isEmpty) {
-        final created = await database.insertLedger(
-          LedgerModel(name: 'دفتر شخصي', currencyCode: 'YER'),
-        );
-        final defaultLedger = LedgerModel(
-          id: created,
-          name: 'دفتر شخصي',
-          currencyCode: 'YER',
-        );
-        ledgers = [defaultLedger];
+        await database.insertLedger(LedgerModel(name: 'دفتر شخصي', currencyCode: 'YER'));
+        ledgers = await database.getLedgers();
       }
 
-      selectedLedger = ledgers.first;
-      await refreshLedgerData();
+      selectedLedger = ledgers.firstOrNull;
+      if (selectedLedger != null) {
+        await refreshLedgerData();
+      }
     } finally {
       isBusy = false;
       notifyListeners();
@@ -51,11 +45,16 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedLedger(LedgerModel ledger) {
+    selectedLedger = ledger;
+    refreshLedgerData();
+  }
+
   Future<void> addLedger(String name, String currencyCode) async {
     final ledger = LedgerModel(name: name, currencyCode: currencyCode);
-    final newId = await database.insertLedger(ledger);
+    final createdId = await database.insertLedger(ledger);
     final created = LedgerModel(
-      id: newId,
+      id: createdId,
       name: name,
       currencyCode: currencyCode,
     );
@@ -100,13 +99,6 @@ class AppState extends ChangeNotifier {
 
   double get netBalance => totalReceivable - totalPayable;
 
-  Locale get locale => const Locale('ar');
-
-  String currencySymbol() {
-    if (selectedLedger == null) return 'YER';
-    return selectedLedger!.currencyCode;
-  }
-
   Map<String, dynamic> personBalance(PersonModel person) {
     final personTransactions = transactions.where((t) => t.personId == person.id).toList();
     double receivable = 0;
@@ -127,4 +119,8 @@ class AppState extends ChangeNotifier {
       'net': receivable - payable,
     };
   }
+}
+
+extension ListFirstOrNull<T> on List<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }
